@@ -9,6 +9,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <memory>
 #include "shape.h"
 #include "point.h"
 #include "line.h"
@@ -28,19 +29,19 @@ enum MenuSelection{
 
 //Function proto-types (Declarations)
 //---------------------------------------------------------
-void printMenu(std::string menu[]);
+void printMenu(std::array<std::string, 5> menu);
 Point newPoint();
-Line *newLine();
-Circle *newCircle();
-Rectangle *newRectangle();
-void printShapeCollection(std::vector<Shape *> shapeCollection);
+std::unique_ptr<Line> newLine();
+std::unique_ptr<Circle>newCircle();
+std::unique_ptr<Rectangle>newRectangle();
+void printShapeCollection(std::vector<std::shared_ptr<Shape>> shapeCollection);
 
 int main() {
     //vector holding pointer to shape class
-    std::vector<Shape *> shapeCollection;
+    std::vector<std::shared_ptr<Shape>> shapeCollection;
 
     //array containing menu options
-    std::string menu[5] = {"Line", "Rectangle", "Circle", "Print", "Exit"};
+     const std::array<std::string, 5> menu = {"Line", "Rectangle", "Circle", "Print", "Exit"};
 
     int userSelection;
     do{
@@ -72,11 +73,6 @@ int main() {
 
     }while(userSelection !=  5);
 
-        //deleting memory spaces that were created in the heap to prevent memory leaks
-        for(int i = 0; i < shapeCollection.size(); i++){
-            delete shapeCollection[i];
-        }
-
     return 0;
 }
 
@@ -86,7 +82,7 @@ int main() {
  * function prints menu options
  * @param menu array containing strings of menu items
  */
-void printMenu(std::string menu[]){
+void printMenu(std::array<std::string, 5> menu){
     std::cout << "\nEnter corresponding number:\n";
     for(int i = 0; i < 5; i++){
         std::cout << "      " << i + 1 << ". " + menu[i] << std::endl;
@@ -117,13 +113,13 @@ Point newPoint(){
  * function creates a pointer to a line of Line instance
  * @return a pointer to line
  */
-Line *newLine(){
+std::unique_ptr<Line> newLine(){
     std::cout << "Enter two points for a line..." << std::endl;
 
     Point point1 = newPoint();
     Point point2 = newPoint();
 
-    Line * line = new Line(point1, point2);
+    std::unique_ptr<Line> line(new Line(point1, point2));
 
     return line;
 }//end newLine
@@ -132,7 +128,7 @@ Line *newLine(){
  * function creates a pointer to a rectangle of Rectangle instance
  * @return a pointer to rectangle
  */
-Rectangle *newRectangle(){
+std::unique_ptr<Rectangle>newRectangle(){
     std::cout << "Enter top left point of a rectangle..." << std::endl;
     Point point1 = newPoint();
 
@@ -142,7 +138,7 @@ Rectangle *newRectangle(){
     std::cout << "\nEnter height of the rectangle:";
     std::cin >> height;
 
-    Rectangle *rectangle = new Rectangle(point1, width, height);
+    std::unique_ptr<Rectangle>rectangle (new Rectangle(point1, width, height));
 
     return rectangle;
 }//end newRectangle
@@ -151,7 +147,7 @@ Rectangle *newRectangle(){
  * function creates a pointer to a circle of Circle instance
  * @return a pointer to circle
  */
-Circle *newCircle(){
+std::unique_ptr<Circle>newCircle(){
     std::cout << "Enter center point of a circle..." << std::endl;
     Point centerPoint = newPoint();
 
@@ -159,7 +155,7 @@ Circle *newCircle(){
     std::cout << "\nEnter a radius of the circle:";
     std::cin >> radius;
 
-    Circle *circle = new Circle(centerPoint, radius);
+    std::unique_ptr<Circle>circle (new Circle(centerPoint, radius));
 
     return circle;
 }//end newCirlce
@@ -168,9 +164,10 @@ Circle *newCircle(){
  * prints pointers of Shape stored in shapeCollection vector
  * @param shapeCollection vector of type Shape*
  */
-void printShapeCollection(std::vector<Shape *> shapeCollection){
+void printShapeCollection(std::vector<std::shared_ptr<Shape>> shapeCollection){
     std::cout << "Shapes...\n";
-    for(int i = 0; i < shapeCollection.size(); i++){
-        std::cout << shapeCollection[i]->shapeRepresentation();
+    std::vector<std::shared_ptr<Shape>>::iterator iter;
+    for(iter = shapeCollection.begin(); iter != shapeCollection.end(); iter++){
+        std::cout << (*iter)->shapeRepresentation();
     }//end shapeRepresentation for loop
 }//end printShapeCollection
