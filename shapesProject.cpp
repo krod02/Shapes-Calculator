@@ -3,7 +3,7 @@
 // Devl: Kevin Rodriguez
 // Desc: Shapes project that allows user to calculate details about
 //       that shape as well as storing the shapes into a collection.
-//-------------------------------------------------------------------
+//------------------------------------------------------------------
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <cmath>
